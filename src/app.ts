@@ -25,8 +25,11 @@ async function bootstrap() {
             // Сохраняем текущие тарифы batch insert
             await saveTariffsToDB(tariffs, { saveCurrent: true });
 
-            // Обновляем Google Sheets
-            await updateGoogleSheet(tariffs);
+            const spreadsheetIds = [
+                "1SB6z-eEB7SEN8vEuKTcSd6-Uh76XBOgZObCyp7F2MhU"
+            ];
+
+            await updateGoogleSheet(tariffs, spreadsheetIds);
 
             // Лог памяти для мониторинга
             const mem = process.memoryUsage();

@@ -16,24 +16,30 @@ async function getSheetsClient(): Promise<sheets_v4.Sheets> {
     return sheetsClient;
 }
 
-export async function updateGoogleSheet(tariffs: Tariff[]) {
+export async function updateGoogleSheet(tariffs: Tariff[], spreadsheetIds: string[]) {
     try {
         const sheets = await getSheetsClient();
-        const spreadsheetId = "1SB6z-eEB7SEN8vEuKTcSd6-Uh76XBOgZObCyp7F2MhU";
 
-        // Prepare the data
+        // Prepare the data once for all sheets
         const values = tariffs.map(t => [t.id, t.value]);
 
-        // Update the sheet
-        const response = await sheets.spreadsheets.values.update({
-            spreadsheetId,
-            range: "Лист1!A2:B", // Check this range carefully
-            valueInputOption: "RAW",
-            requestBody: { values },
-        });
-        console.log("Update successful:", response.data);
+        // Update all spreadsheets
+        const updatePromises = spreadsheetIds.map(spreadsheetId =>
+            sheets.spreadsheets.values.update({
+                spreadsheetId,
+                range: "Лист1!A2:B",
+                valueInputOption: "RAW",
+                requestBody: { values },
+            })
+        );
+
+        // Wait for all updates to complete
+        const responses = await Promise.all(updatePromises);
+
+        console.log(`Update successful for ${responses.length} sheets`);
+        return responses;
     } catch (err) {
-        // This will log the specific error from the Google API
+        console.error("Error updating Google Sheets:", err);
         throw err;
     }
 }
