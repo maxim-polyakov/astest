@@ -26,3 +26,6 @@ WORKDIR /app
 COPY --from=build /app/package*.json .
 COPY --from=deps-prod /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+
+# Устанавливаем переменную окружения для пути к credentials
+ENV GOOGLE_APPLICATION_CREDENTIALS="/app/dist/perfect-precept-433720-f3-23d6ba7a783b.json"
