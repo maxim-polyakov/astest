@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { fetchTariffsFromWB } from "./services/wb.js";
-import { saveTariffsToDB, Tariff } from "./services/db.js";
+import { saveTariffsToDB, Tariff, transformWBTariffsToTariffArray } from "./services/db.js";
 import { updateGoogleSheet } from "./services/googleSheets.js";
 
 /**
@@ -15,7 +15,9 @@ async function bootstrap() {
         console.log(start.toISOString(), "Running 1-second cron...");
 
         try {
-            const tariffs: Tariff[] = await fetchTariffsFromWB();
+            let tariffs: Tariff[] = await fetchTariffsFromWB();
+
+            tariffs = await transformWBTariffsToTariffArray(tariffs);
 
             // Сохраняем текущие тарифы batch insert
             await saveTariffsToDB(tariffs, { saveCurrent: true });
