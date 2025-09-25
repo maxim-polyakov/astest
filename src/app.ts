@@ -22,7 +22,7 @@ async function bootstrap() {
             tariffs = await transformWBTariffsToTariffArray(tariffs);
 
             // Сохраняем текущие тарифы batch insert
-            await saveTariffsToDB(tariffs, { saveCurrent: true });
+            await saveTariffsToDB(tariffs, { saveHistory: true, saveCurrent: true });
 
             const spreadsheetIds = [
                 "1SB6z-eEB7SEN8vEuKTcSd6-Uh76XBOgZObCyp7F2MhU",
