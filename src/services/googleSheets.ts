@@ -20,28 +20,53 @@ export async function updateGoogleSheet(tariffs: Tariff[], spreadsheetIds: strin
     try {
         const sheets = await getSheetsClient();
 
-        // Prepare the data once for all sheets
-        const values = tariffs.map(t => [t.id, t.value]);
+        // Обрабатываем тарифы: заполняем пустые value нулями
+        const processedTariffs = tariffs.map(t => {
+            let value = t.value;
 
-        // Update all spreadsheets
+            // Проверяем, является ли value числом
+            if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
+                console.warn(`Некорректное значение для тарифа ${t.id}: ${value}, заменяем на 0`);
+                value = 0;
+            }
+
+            return {
+                ...t,
+                value: value
+            };
+        });
+
+        // Сортируем тарифы по возрастанию коэффициента (value)
+        const sortedTariffs = [...processedTariffs].sort((a, b) => a.value - b.value);
+
+        // Подготавливаем данные с заголовками
+        const values = [
+            ["Тариф", "Коэффициент"], // Заголовки
+            ...sortedTariffs.map(t => [t.id, t.value])
+        ];
+
+        // Обновляем все таблицы
         const updatePromises = spreadsheetIds.map(spreadsheetId =>
             sheets.spreadsheets.values.update({
                 spreadsheetId,
-                range: "Лист1!A2:B",
+                range: "stocks_coefs!A1:B", // Обновляем с первой строки (заголовки)
                 valueInputOption: "RAW",
                 requestBody: { values },
             })
         );
 
-        // Wait for all updates to complete
+        // Ждем завершения всех обновлений
         const responses = await Promise.all(updatePromises);
 
-        console.log(`Update successful for ${responses.length} sheets`);
+        // Подсчитываем сколько значений было заполнено нулями
+        const zeroCount = processedTariffs.filter(t => t.value === 0).length;
+
+        console.log(`Успешно обновлено ${responses.length} таблиц, отсортировано ${sortedTariffs.length} тарифов`);
+        console.log(`Заполнено нулями: ${zeroCount} пустых значений`);
+
         return responses;
     } catch (err) {
-        console.error("Error updating Google Sheets:", err);
+        console.error("Ошибка при обновлении Google Sheets:", err);
         throw err;
     }
 }
-
-
