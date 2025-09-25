@@ -1,11 +1,7 @@
 import cron from "node-cron";
-
-// @ts-ignore
-import { fetchTariffsFromWB } from "./services/wb.ts";
-// @ts-ignore
-import { saveTariffsToDB, Tariff } from "./services/db.ts";
-// @ts-ignore
-import { updateGoogleSheet } from "./services/googleSheets.ts";
+import { fetchTariffsFromWB } from "./services/wb.js";
+import { saveTariffsToDB, Tariff } from "./services/db.js";
+import { updateGoogleSheet } from "./services/googleSheets.js";
 
 /**
  * Запускаем сервис

@@ -1,6 +1,6 @@
 import { google, sheets_v4 } from "googleapis";
 // @ts-ignore
-import { Tariff } from "./db.ts";
+import { Tariff } from "./db";
 
 // Singleton для Google Sheets
 let sheetsClient: sheets_v4.Sheets | null = null;
