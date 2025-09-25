@@ -8,7 +8,7 @@ let sheetsClient: sheets_v4.Sheets | null = null;
 async function getSheetsClient(): Promise<sheets_v4.Sheets> {
     if (!sheetsClient) {
         const auth = new google.auth.GoogleAuth({
-            keyFile: "perfect-precept-433720-f3-d0f24cfa89e6.json",
+            keyFile: "src/perfect-precept-433720-f3-23d6ba7a783b.json",
             scopes: ["https://www.googleapis.com/auth/spreadsheets"],
         });
         sheetsClient = google.sheets({ version: "v4", auth });

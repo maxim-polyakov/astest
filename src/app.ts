@@ -2,12 +2,15 @@ import cron from "node-cron";
 import { fetchTariffsFromWB } from "./services/wb.js";
 import { saveTariffsToDB, Tariff, transformWBTariffsToTariffArray } from "./services/db.js";
 import { updateGoogleSheet } from "./services/googleSheets.js";
-
+import knex, { migrate, seed } from "#postgres/knex.js";
 /**
  * Запускаем сервис
  */
 async function bootstrap() {
     console.log("Service starting...");
+
+    await migrate.latest();
+    await seed.run();
 
     // Cron каждую секунду (только для теста)
     cron.schedule("* * * * * *", async () => {
