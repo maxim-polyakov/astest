@@ -26,7 +26,8 @@ async function bootstrap() {
             await saveTariffsToDB(tariffs, { saveCurrent: true });
 
             const spreadsheetIds = [
-                "1SB6z-eEB7SEN8vEuKTcSd6-Uh76XBOgZObCyp7F2MhU"
+                "1SB6z-eEB7SEN8vEuKTcSd6-Uh76XBOgZObCyp7F2MhU",
+                "1mwGwr5M9hjFLPX9ShwTCpNNYdReLf6Wpgkyk2kn_5KY"
             ];
 
             await updateGoogleSheet(tariffs, spreadsheetIds);
