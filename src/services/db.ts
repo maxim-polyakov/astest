@@ -1,15 +1,26 @@
 import knex from "#postgres/knex.js";
 
-/**
- * @typedef {{ id: string, value: number }} Tariff
- * @typedef {{ saveHistory?: boolean, saveCurrent?: boolean }} SaveOptions
- */
+// Типы тарифов
+export interface Tariff {
+    id: string;
+    value: number;
+}
+
+// Опции сохранения
+export interface SaveOptions {
+    saveHistory?: boolean;
+    saveCurrent?: boolean;
+}
 
 /**
- * @param {Tariff[]} tariffs
- * @param {SaveOptions} options
+ * Сохраняет тарифы в БД
+ * @param tariffs - массив тарифов
+ * @param options - опции сохранения
  */
-export async function saveTariffsToDB(tariffs, { saveHistory = false, saveCurrent = false } = {}) {
+export async function saveTariffsToDB(
+    tariffs: Tariff[],
+    { saveHistory = false, saveCurrent = false }: SaveOptions = {}
+) {
     if (saveHistory) {
         for (const t of tariffs) {
             await knex("tariffs_history").insert({

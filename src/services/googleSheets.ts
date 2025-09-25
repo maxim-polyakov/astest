@@ -1,13 +1,15 @@
 import { google } from "googleapis";
-/**
- * @typedef {{ id: string, value: number }} Tariff
- * @typedef {{ saveHistory?: boolean, saveCurrent?: boolean }} SaveOptions
- */
+
+export interface Tariff {
+    id: string;
+    value: number;
+}
 
 /**
- * @param {Tariff[]} tariffs
+ * Обновляет Google Sheet актуальными тарифами
+ * @param tariffs - массив тарифов
  */
-export async function updateGoogleSheet(tariffs) {
+export async function updateGoogleSheet(tariffs: Tariff[]) {
     const auth = new google.auth.GoogleAuth({
         keyFile: "credentials.json",
         scopes: ["https://www.googleapis.com/auth/spreadsheets"],
