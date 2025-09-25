@@ -1,8 +1,11 @@
 import cron from "node-cron";
 import { migrate, seed } from "#postgres/knex.js";
+// @ts-ignore
 import { fetchTariffsFromWB } from "./services/wb.ts";
+// @ts-ignore
 import { saveTariffsToDB } from "./services/db.ts";
-import { updateGoogleSheet } from "./services/googleSheets.ts";
+// @ts-ignore
+import { updateGoogleSheet } from "#services/googleSheets.ts";
 
 async function bootstrap() {
     // 1️⃣ Запускаем миграции и сиды при старте
