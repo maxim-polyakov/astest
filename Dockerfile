@@ -13,9 +13,13 @@ RUN npm install --include=dev
 
 COPY . .
 
+# увеличиваем память для tsc
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 RUN npm run build
 
 FROM node:20-alpine AS prod
+
 
 WORKDIR /app
 

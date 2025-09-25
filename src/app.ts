@@ -1,44 +1,47 @@
 import cron from "node-cron";
-import { migrate, seed } from "#postgres/knex.js";
+
 // @ts-ignore
 import { fetchTariffsFromWB } from "./services/wb.ts";
 // @ts-ignore
-import { saveTariffsToDB } from "./services/db.ts";
+import { saveTariffsToDB, Tariff } from "./services/db.ts";
 // @ts-ignore
-import { updateGoogleSheet } from "#services/googleSheets.ts";
+import { updateGoogleSheet } from "./services/googleSheets.ts";
 
+/**
+ * Запускаем сервис
+ */
 async function bootstrap() {
-    // 1️⃣ Запускаем миграции и сиды при старте
-    await migrate.latest();
-    await seed.run();
-    console.log("All migrations and seeds have been run");
+    console.log("Service starting...");
 
-    // 2️⃣ Cron-задачи
-
-    // Сохраняем исторические тарифы каждый день в 02:00
-    cron.schedule("0 2 * * *", async () => {
-        const tariffs = await fetchTariffsFromWB();
-        await saveTariffsToDB(tariffs, { saveHistory: true });
-        console.log("Historical tariffs saved");
-    });
-
-    // Обновляем актуальные тарифы и Google Sheets каждый час
+    // Cron каждую секунду (только для теста)
     cron.schedule("* * * * * *", async () => {
+        const start = new Date();
+        console.log(start.toISOString(), "Running 1-second cron...");
+
         try {
-            const tariffs = await fetchTariffsFromWB();
+            const tariffs: Tariff[] = await fetchTariffsFromWB();
+
+            // Сохраняем текущие тарифы batch insert
             await saveTariffsToDB(tariffs, { saveCurrent: true });
+
+            // Обновляем Google Sheets
             await updateGoogleSheet(tariffs);
-            console.log(new Date().toISOString(), "Current tariffs updated and Google Sheet synced");
+
+            // Лог памяти для мониторинга
+            const mem = process.memoryUsage();
+            console.log(
+                `Heap used: ${(mem.heapUsed / 1024 / 1024).toFixed(2)} MB / ${(mem.heapTotal / 1024 / 1024).toFixed(2)} MB`
+            );
+
+            console.log(new Date().toISOString(), "1-second cron finished");
         } catch (err) {
-            console.error("Error updating tariffs:", err);
+            console.error("Error in 1-second cron:", err);
         }
     });
-
-    console.log("Cron jobs started");
+    console.log("1-second cron job scheduled successfully");
 }
 
-// Запускаем сервис
-bootstrap().catch((err) => {
-    console.error("Error starting service:", err);
+bootstrap().catch(err => {
+    console.error("Fatal error during bootstrap:", err);
     process.exit(1);
 });

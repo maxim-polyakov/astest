@@ -1,21 +1,23 @@
-import { google } from "googleapis";
+import { google, sheets_v4 } from "googleapis";
+// @ts-ignore
+import { Tariff } from "./db.ts";
 
-export interface Tariff {
-    id: string;
-    value: number;
+// Singleton для Google Sheets
+let sheetsClient: sheets_v4.Sheets | null = null;
+
+async function getSheetsClient(): Promise<sheets_v4.Sheets> {
+    if (!sheetsClient) {
+        const auth = new google.auth.GoogleAuth({
+            keyFile: "credentials.json",
+            scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+        });
+        sheetsClient = google.sheets({ version: "v4", auth });
+    }
+    return sheetsClient;
 }
 
-/**
- * Обновляет Google Sheet актуальными тарифами
- * @param tariffs - массив тарифов
- */
 export async function updateGoogleSheet(tariffs: Tariff[]) {
-    const auth = new google.auth.GoogleAuth({
-        keyFile: "credentials.json",
-        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    });
-
-    const sheets = google.sheets({ version: "v4", auth });
+    const sheets = await getSheetsClient();
     const spreadsheetId = "YOUR_SPREADSHEET_ID";
 
     const values = tariffs.map(t => [t.id, t.value]);
