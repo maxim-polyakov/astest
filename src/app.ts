@@ -12,8 +12,7 @@ async function bootstrap() {
     await migrate.latest();
     await seed.run();
 
-    // Cron каждую секунду (только для теста)
-    cron.schedule("* * * * * *", async () => {
+    cron.schedule("0 * * * *", async () => {
         const start = new Date();
         console.log(start.toISOString(), "Running 1-second cron...");
 
@@ -38,12 +37,12 @@ async function bootstrap() {
                 `Heap used: ${(mem.heapUsed / 1024 / 1024).toFixed(2)} MB / ${(mem.heapTotal / 1024 / 1024).toFixed(2)} MB`
             );
 
-            console.log(new Date().toISOString(), "1-second cron finished");
+            console.log(new Date().toISOString(), "1-hour cron finished");
         } catch (err) {
-            console.error("Error in 1-second cron:", err);
+            console.error("Error in 1-hour cron:", err);
         }
     });
-    console.log("1-second cron job scheduled successfully");
+    console.log("1-hour cron job scheduled successfully");
 }
 
 bootstrap().catch(err => {
